@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WHERE YOU STAND — TRACE IT BACKWARDS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #0a0a0a;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+            color: #d8d8d8;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            background: #0a0a0a;
+        }
+
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .text-layer {
+            position: absolute;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+        }
+
+        .text-layer.visible {
+            opacity: 1;
+        }
+
+        #sceneQuestion {
+            top: 80px;
+            left: 60px;
+            max-width: 500px;
+            font-size: 24px;
+            font-weight: 300;
+            line-height: 1.5;
+            letter-spacing: 0.4px;
+        }
+
+        #realizationQuestion {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 26px;
+            font-weight: 300;
+            line-height: 1.6;
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+        }
+
+        #continuePrompt {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 16px;
+            font-weight: 300;
+            letter-spacing: 0.8px;
+            opacity: 0;
+            transition: opacity 0.6s ease;
+            cursor: pointer;
+            pointer-events: none;
+        }
+
+        #continuePrompt.visible {
+            opacity: 0.6;
+            pointer-events: auto;
+        }
+
+        #continuePrompt:hover {
+            opacity: 1;
+        }
+
+        #interpretiveOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 10, 10, 0.7);
+            opacity: 0;
+            transition: opacity 0.8s ease;
+            pointer-events: none;
+            z-index: 14;
+        }
+
+        #interpretiveOverlay.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        #interpretiveContainer {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            transition: opacity 0.8s ease;
+            pointer-events: none;
+            z-index: 15;
+            text-align: center;
+        }
+
+        #interpretiveContainer.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .interpretive-content {
+            max-width: 45vw;
+        }
+
+        .interpretive-title {
+            font-size: 52px;
+            font-weight: 300;
+            letter-spacing: 2px;
+            margin-bottom: 50px;
+            line-height: 1.3;
+            word-spacing: 100vw;
+        }
+
+        .interpretive-text {
+            font-size: 18px;
+            font-weight: 300;
+            line-height: 1.8;
+            color: #a8a8a8;
+            max-width: 560px;
+            margin: 0 auto;
+        }
+
+        #evidenceDrawer {
+            position: fixed;
+            right: 0;
+            top: 0;
+            height: 100%;
+            width: 0;
+            background: #0a0a0a;
+            border-left: 1px solid #2a2a2a;
+            transition: width 0.5s ease;
+            z-index: 20;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        #evidenceDrawer.open {
+            width: 35%;
+            pointer-events: auto;
+        }
+
+        .evidence-inner {
+            padding: 60px 40px;
+            max-width: 100%;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .evidence-close {
+            position: fixed;
+            top: 30px;
+            right: 40px;
+            font-size: 28px;
+            cursor: pointer;
+            opacity: 0.5;
+            transition: opacity 0.3s ease;
+            z-index: 21;
+            pointer-events: auto;
+        }
+
+        .evidence-close:hover {
+            opacity: 1;
+        }
+
+        #evidenceNodeName {
+            font-size: 28px;
+            font-weight: 300;
+            letter-spacing: 1px;
+            margin-bottom: 30px;
+            color: #d8d8d8;
+        }
+
+        .evidence-label {
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 1.3px;
+            color: #5a5a5a;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+            margin-top: 50px;
+        }
+
+        .evidence-label:first-of-type {
+            margin-top: 0;
+        }
+
+        .evidence-section {
+            margin-bottom: 40px;
+            text-align: left;
+        }
+
+        .evidence-participant {
+            font-size: 12px;
+            font-weight: 400;
+            letter-spacing: 0.3px;
+            color: #6a7a6a;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #1a2a1a;
+        }
+
+        .evidence-account {
+            font-size: 14px;
+            line-height: 1.7;
+            color: #8a9a8a;
+            margin-bottom: 24px;
+        }
+
+        .evidence-account.variant-b {
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid #1a2a1a;
+        }
+
+        .evidence-reading {
+            font-size: 14px;
+            font-weight: 300;
+            line-height: 1.7;
+            color: #a8a8a8;
+            margin-bottom: 8px;
+        }
+
+        .evidence-connection {
+            font-size: 13px;
+            line-height: 1.7;
+            color: #7a8a7a;
+            margin-bottom: 16px;
+            font-style: italic;
+        }
+
+        .connection-link {
+            display: inline-block;
+            margin-top: 16px;
+            padding: 8px 0;
+            font-size: 12px;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+            color: #6a8a7a;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            text-decoration: none;
+            border-bottom: 1px solid #3a5a4a;
+        }
+
+        .connection-link:hover {
+            color: #8aaaa9;
+            border-bottom-color: #5a8a7a;
+        }
+
+        .evidence-complication {
+            font-size: 13px;
+            line-height: 1.7;
+            color: #6a7a6a;
+            opacity: 0.9;
+        }
+
+        .complication-emphasis {
+            display: block;
+            margin-top: 12px;
+            margin-bottom: 8px;
+            font-weight: 400;
+            color: #7a8a7a;
+        }
+
+        #connectionLine {
+            position: fixed;
+            z-index: 16;
+            pointer-events: none;
+        }
+
+        @media (max-width: 1400px) {
+            #evidenceDrawer.open {
+                width: 40%;
+            }
+            .interpretive-content {
+                max-width: 55vw;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            #sceneQuestion {
+                font-size: 20px;
+                top: 60px;
+                left: 40px;
+            }
+            #evidenceDrawer.open {
+                width: 45%;
+            }
+            .interpretive-title {
+                font-size: 40px;
+            }
+            .interpretive-text {
+                font-size: 16px;
+            }
+            .evidence-inner {
+                padding: 50px 30px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                transition: none !important;
+            }
+        }
+
+        @media (prefers-contrast: more) {
+            body {
+                background: #000000;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #3a3a3a;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4a4a4a;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="scene"></canvas>
+    <svg id="connectionLine" style="display: none;">
+        <line x1="0" y1="0" x2="0" y2="0" stroke="#4a6a5a" stroke-width="1.5" opacity="0.3" stroke-dasharray="4,4"/>
+    </svg>
+    <div id="overlay">
+        <div id="sceneQuestion" class="text-layer">Where did this publication begin?</div>
+        <div id="realizationQuestion" class="text-layer">Where did the research actually begin?</div>
+    </div>
+
+    <div id="continuePrompt" class="text-layer">CONTINUE →</div>
+
+    <div id="interpretiveOverlay"></div>
+    <div id="interpretiveContainer" class="text-layer">
+        <div class="interpretive-content">
+            <div class="interpretive-title">INFRASTRUCTURE<br>HAS A PULSE.</div>
+            <div class="interpretive-text">Visible research outputs rest on human, technical, relational and material infrastructures whose contributions are unevenly recognised.</div>
+        </div>
+    </div>
+
+    <div id="evidenceDrawer">
+        <div class="evidence-close">×</div>
+        <div class="evidence-inner">
+            <div id="evidenceNodeName"></div>
+            
+            <div id="evidenceContent"></div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('scene');
+        const ctx = canvas.getContext('2d', { alpha: true });
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const config = {
+            backgroundColor: '#0a0a0a',
+            accentLight: '#e8d4b8',
+            accentMid: '#c9a961',
+            accentDim: '#6b5d47',
+            textColor: '#d8d8d8',
+            textDim: '#5a5a5a',
+            traceColor: '#3a3a3a',
+        };
+
+        const textElements = {
+            question: document.getElementById('sceneQuestion'),
+            realization: document.getElementById('realizationQuestion'),
+            interpretiveContainer: document.getElementById('interpretiveContainer'),
+            interpretiveOverlay: document.getElementById('interpretiveOverlay'),
+            continuePrompt: document.getElementById('continuePrompt'),
+        };
+
+        let sceneState = 'beat1';
+        let stateTime = 0;
+        let selectedElementId = null;
+        let networkOpacity = 1;
+        let canvasOpacityMultiplier = 1;
+
+        const timings = {
+            questionAppear: 800,
+            connectionEmergence: 2200,
+            dataAppear: 3000,
+            beat2Delay: 5500,
+            beat3Delay: 8500,
+            beat4Delay: 12000,
+            realizationDelay: 16000,
+            realizationHoldMin: 5000,
+            continueAppear: 21000,
+            interpretiveDelay: 99999,
+        };
+
+        // Evidence data structure
+        const evidenceData = {
+            technicalJudgement: {
+                title: 'TECHNICAL JUDGEMENT',
+                sections: [
+                    {
+                        type: 'account',
+                        label: 'PARTICIPANT ACCOUNT',
+                        participant: 'Agnes, Technical specialist',
+                        content: 'Agnes described research working particularly well when technical staff are involved in conversation from the beginning: clarifying the objective and expectations, discussing what is available, and establishing whether something is feasible. She also described accumulated technical experience as important because experienced staff have already encountered different problems and are more likely to ask, in effect, "have we thought about this?"'
+                    },
+                    {
+                        type: 'reading',
+                        label: 'ANALYTIC READING',
+                        content: 'Technical expertise is not simply support supplied after research has been designed. In this account, technical judgement participates in determining what can feasibly be asked, how research can be undertaken, and which problems can be anticipated before they affect the work. This makes expertise part of knowledge production itself.'
+                    },
+                    {
+                        type: 'connection',
+                        label: 'CONNECTION',
+                        connectionText: 'Expertise and equipment do not operate independently.',
+                        links: [
+                            { id: 'equipment', label: 'EQUIPMENT + TOOLS' }
+                        ]
+                    },
+                    {
+                        type: 'complication',
+                        label: 'COMPLICATION',
+                        content: 'Technical staff do not all occupy the same position. Differences in expertise, seniority, qualification, role design and involvement in research can affect whether technical judgement becomes recognised as intellectual contribution.',
+                        followText: 'FOLLOW THIS → RECOGNITION',
+                        followLink: { id: 'recognition', label: 'RECOGNITION' }
+                    }
+                ]
+            },
+            equipment: {
+                title: 'EQUIPMENT + TOOLS',
+                sections: [
+                    {
+                        type: 'account',
+                        label: 'PARTICIPANT ACCOUNT',
+                        participant: 'Agnes, Technical specialist',
+                        content: 'Agnes described equipment as an active source of uncertainty rather than passive infrastructure: an instrument may work perfectly one week and present problems the next, even when the analysis and setup appear to be the same.'
+                    },
+                    {
+                        type: 'reading',
+                        label: 'ANALYTIC READING',
+                        content: 'Equipment does not produce reliable research conditions by simply existing. Its research value depends upon maintenance, troubleshooting, accumulated knowledge, access, time and people able to recognise when apparently routine processes are no longer routine. Material infrastructure therefore depends upon human infrastructure.'
+                    },
+                    {
+                        type: 'connection',
+                        label: 'CONNECTION',
+                        connectionText: 'Reliability is produced through relationships between material and human infrastructure.',
+                        links: [
+                            { id: 'maintenance', label: 'MAINTENANCE' },
+                            { id: 'technicalJudgement', label: 'TECHNICAL JUDGEMENT' },
+                            { id: 'time', label: 'TIME' }
+                        ]
+                    },
+                    {
+                        type: 'complication',
+                        label: 'COMPLICATION',
+                        content: 'Avoid implying that all research depends upon laboratory equipment. The broader analytic proposition concerns tools and infrastructures through which knowledge is produced; their form and significance vary substantially between kinds of research.'
+                    }
+                ]
+            },
+            recognition: {
+                title: 'RECOGNITION',
+                sections: [
+                    {
+                        type: 'account',
+                        label: 'PARTICIPANT ACCOUNTS',
+                        accounts: [
+                            {
+                                participant: 'Sargent, Technical professional',
+                                content: 'Sargent described being approached with research projects and helping to work out how they could be done, including devising substantial experimental campaigns before handing the results back to researchers to address their scientific question. He described himself as relatively visible and partner-like because his work is highly specialist and non-routine, he has a doctorate, and he co-supervises students.'
+                            },
+                            {
+                                participant: 'Sarah, Institutional research-culture role',
+                                content: 'Sarah described technicians as appearing in institutional accounts, but not as fully embedded or integrated as she believed they should be. She described professional-services staff as even less visible: sometimes acknowledged for enabling grant applications or strategic support, but rarely represented as people whose own relationships, contribution and development form part of the research environment.'
+                            }
+                        ]
+                    },
+                    {
+                        type: 'reading',
+                        label: 'ANALYTIC READING',
+                        content: 'Contribution and recognition are not the same thing. Research systems can depend upon work without making that work equally legible as knowledge-producing contribution. Visibility is therefore not simply a property of a role. It is produced through status, expertise, qualification, proximity to recognised research activity, institutional categories and attribution practices.'
+                    },
+                    {
+                        type: 'connection',
+                        label: 'CONNECTION',
+                        connectionText: 'What makes a contribution legible as knowledge-producing labour?',
+                        links: [
+                            { id: 'technicalJudgement', label: 'TECHNICAL JUDGEMENT' },
+                            { id: 'organisationalMemory', label: 'ORGANISATIONAL MEMORY' },
+                            { id: 'communication', label: 'COMMUNICATION' },
+                            { id: 'publication', label: 'PUBLICATION' }
+                        ]
+                    },
+                    {
+                        type: 'complication',
+                        label: 'COMPLICATION',
+                        sections: [
+                            {
+                                emphasis: 'Do NOT reduce this to: "Technicians are invisible."',
+                                content: 'Sargent\'s account explicitly complicates that interpretation. Some technical professionals can become highly visible as intellectual partners.'
+                            },
+                            {
+                                emphasis: 'The analytic question is therefore not simply: "Who is invisible?"',
+                                content: 'It is: "What conditions make particular forms of contribution visible, credible and recognisable?"'
+                            }
+                        ]
+                    }
+                ]
+            }
+        };
+
+        // Elements definition (abbreviated for space)
+        const elements = {
+            publication: { id: 'publication', label: 'PUBLICATION', x: 0.5, y: 0.15, type: 'core', opacity: 0, targetOpacity: 0, size: 45, hovered: false, selected: false, layer: 0, category: 'output', labelOffset: { x: 0, y: 80 } },
+            data: { id: 'data', label: 'DATA', x: 0.5, y: 0.35, type: 'primary', opacity: 0, targetOpacity: 0, size: 35, hovered: false, selected: false, layer: 1, category: 'material', labelOffset: { x: 0, y: 65 } },
+            technicalJudgement: { id: 'technicalJudgement', label: 'TECHNICAL\nJUDGEMENT', x: 0.25, y: 0.4, type: 'primary', opacity: 0, targetOpacity: 0, size: 32, hovered: false, selected: false, layer: 1, category: 'human', labelOffset: { x: -60, y: 0 } },
+            method: { id: 'method', label: 'METHOD /\nANALYTIC\nDECISIONS', x: 0.75, y: 0.4, type: 'primary', opacity: 0, targetOpacity: 0, size: 32, hovered: false, selected: false, layer: 1, category: 'human', labelOffset: { x: 60, y: 0 } },
+            equipment: { id: 'equipment', label: 'EQUIPMENT\n+ TOOLS', x: 0.35, y: 0.55, type: 'primary', opacity: 0, targetOpacity: 0, size: 32, hovered: false, selected: false, layer: 1, category: 'material', labelOffset: { x: -60, y: 0 } },
+            time: { id: 'time', label: 'TIME', x: 0.65, y: 0.55, type: 'primary', opacity: 0, targetOpacity: 0, size: 32, hovered: false, selected: false, layer: 1, category: 'structural', labelOffset: { x: 60, y: 0 } },
+            maintenance: { id: 'maintenance', label: 'MAINTENANCE', x: 0.12, y: 0.28, type: 'secondary', opacity: 0, targetOpacity: 0, size: 28, hovered: false, selected: false, layer: 2, category: 'human', labelOffset: { x: -70, y: 0 } },
+            access: { id: 'access', label: 'ACCESS +\nSCHEDULING', x: 0.88, y: 0.28, type: 'secondary', opacity: 0, targetOpacity: 0, size: 28, hovered: false, selected: false, layer: 2, category: 'structural', labelOffset: { x: 70, y: 0 } },
+            expertise: { id: 'expertise', label: 'EXPERTISE', x: 0.18, y: 0.48, type: 'secondary', opacity: 0, targetOpacity: 0, size: 28, hovered: false, selected: false, layer: 2, category: 'human', labelOffset: { x: -65, y: 0 } },
+            training: { id: 'training', label: 'TRAINING', x: 0.82, y: 0.48, type: 'secondary', opacity: 0, targetOpacity: 0, size: 28, hovered: false, selected: false, layer: 2, category: 'human', labelOffset: { x: 65, y: 0 } },
+            communication: { id: 'communication', label: 'COMMUNICATION', x: 0.12, y: 0.65, type: 'secondary', opacity: 0, targetOpacity: 0, size: 28, hovered: false, selected: false, layer: 2, category: 'relational', labelOffset: { x: -75, y: 0 } },
+            relationships: { id: 'relationships', label: 'RELATIONSHIPS', x: 0.88, y: 0.65, type: 'secondary', opacity: 0, targetOpacity: 0, size: 28, hovered: false, selected: false, layer: 2, category: 'relational', labelOffset: { x: 75, y: 0 } },
+            troubleshooting: { id: 'troubleshooting', label: 'TROUBLESHOOTING\n& FAILED\nATTEMPTS', x: 0.5, y: 0.68, type: 'secondary', opacity: 0, targetOpacity: 0, size: 28, hovered: false, selected: false, layer: 2, category: 'human', labelOffset: { x: 0, y: 80 } },
+            funding: { id: 'funding', label: 'FUNDING', x: 0.08, y: 0.12, type: 'tertiary', opacity: 0, targetOpacity: 0, size: 24, hovered: false, selected: false, layer: 3, category: 'structural', labelOffset: { x: -65, y: 0 } },
+            employment: { id: 'employment', label: 'EMPLOYMENT\nCONDITIONS', x: 0.92, y: 0.12, type: 'tertiary', opacity: 0, targetOpacity: 0, size: 24, hovered: false, selected: false, layer: 3, category: 'structural', labelOffset: { x: 65, y: 0 } },
+            institutional: { id: 'institutional', label: 'INSTITUTIONAL\nPROCESSES', x: 0.35, y: 0.05, type: 'tertiary', opacity: 0, targetOpacity: 0, size: 24, hovered: false, selected: false, layer: 3, category: 'structural', labelOffset: { x: -80, y: -50 } },
+            recognition: { id: 'recognition', label: 'RECOGNITION', x: 0.22, y: 0.8, type: 'tertiary', opacity: 0, targetOpacity: 0, size: 24, hovered: false, selected: false, layer: 3, category: 'structural', labelOffset: { x: -70, y: 0 } },
+            assessment: { id: 'assessment', label: 'ASSESSMENT', x: 0.78, y: 0.8, type: 'tertiary', opacity: 0, targetOpacity: 0, size: 24, hovered: false, selected: false, layer: 3, category: 'structural', labelOffset: { x: 70, y: 0 } },
+            organisationalMemory: { id: 'organisationalMemory', label: 'ORGANISATIONAL\nMEMORY', x: 0.5, y: 0.85, type: 'tertiary', opacity: 0, targetOpacity: 0, size: 24, hovered: false, selected: false, layer: 3, category: 'relational', labelOffset: { x: 0, y: 65 } },
+        };
+
+        const elementList = Object.values(elements);
+
+        const connections = [
+            { from: 'publication', to: 'data', strength: 1, layer: 1 },
+            { from: 'data', to: 'technicalJudgement', strength: 0.8, layer: 1 },
+            { from: 'data', to: 'method', strength: 0.8, layer: 1 },
+            { from: 'data', to: 'equipment', strength: 0.7, layer: 1 },
+            { from: 'data', to: 'time', strength: 0.6, layer: 1 },
+            { from: 'technicalJudgement', to: 'method', strength: 0.9, layer: 1 },
+            { from: 'technicalJudgement', to: 'equipment', strength: 0.7, layer: 1 },
+            { from: 'method', to: 'equipment', strength: 0.7, layer: 1 },
+            { from: 'method', to: 'time', strength: 0.6, layer: 1 },
+            { from: 'equipment', to: 'time', strength: 0.6, layer: 1 },
+            { from: 'maintenance', to: 'equipment', strength: 0.85, layer: 2 },
+            { from: 'maintenance', to: 'time', strength: 0.7, layer: 2 },
+            { from: 'maintenance', to: 'data', strength: 0.65, layer: 2 },
+            { from: 'access', to: 'equipment', strength: 0.8, layer: 2 },
+            { from: 'access', to: 'time', strength: 0.75, layer: 2 },
+            { from: 'access', to: 'relationships', strength: 0.7, layer: 2 },
+            { from: 'expertise', to: 'technicalJudgement', strength: 0.85, layer: 2 },
+            { from: 'expertise', to: 'method', strength: 0.8, layer: 2 },
+            { from: 'expertise', to: 'training', strength: 0.8, layer: 2 },
+            { from: 'training', to: 'expertise', strength: 0.85, layer: 2 },
+            { from: 'training', to: 'time', strength: 0.6, layer: 2 },
+            { from: 'communication', to: 'relationships', strength: 0.9, layer: 2 },
+            { from: 'communication', to: 'expertise', strength: 0.7, layer: 2 },
+            { from: 'relationships', to: 'access', strength: 0.8, layer: 2 },
+            { from: 'relationships', to: 'communication', strength: 0.85, layer: 2 },
+            { from: 'troubleshooting', to: 'technicalJudgement', strength: 0.75, layer: 2 },
+            { from: 'troubleshooting', to: 'time', strength: 0.8, layer: 2 },
+            { from: 'troubleshooting', to: 'expertise', strength: 0.75, layer: 2 },
+            { from: 'funding', to: 'equipment', strength: 0.85, layer: 3 },
+            { from: 'funding', to: 'time', strength: 0.8, layer: 3 },
+            { from: 'funding', to: 'employment', strength: 0.85, layer: 3 },
+            { from: 'funding', to: 'access', strength: 0.7, layer: 3 },
+            { from: 'employment', to: 'time', strength: 0.75, layer: 3 },
+            { from: 'employment', to: 'expertise', strength: 0.7, layer: 3 },
+            { from: 'employment', to: 'assessment', strength: 0.8, layer: 3 },
+            { from: 'institutional', to: 'access', strength: 0.8, layer: 3 },
+            { from: 'institutional', to: 'funding', strength: 0.75, layer: 3 },
+            { from: 'recognition', to: 'assessment', strength: 0.85, layer: 3 },
+            { from: 'recognition', to: 'employment', strength: 0.7, layer: 3 },
+            { from: 'recognition', to: 'communication', strength: 0.65, layer: 3 },
+            { from: 'assessment', to: 'employment', strength: 0.8, layer: 3 },
+            { from: 'assessment', to: 'funding', strength: 0.7, layer: 3 },
+            { from: 'organisationalMemory', to: 'communication', strength: 0.75, layer: 3 },
+            { from: 'organisationalMemory', to: 'expertise', strength: 0.7, layer: 3 },
+            { from: 'organisationalMemory', to: 'institutional', strength: 0.7, layer: 3 },
+        ];
+
+        const connectionAnimations = [];
+        connections.forEach(conn => {
+            connectionAnimations.push({
+                from: conn.from,
+                to: conn.to,
+                strength: conn.strength,
+                layer: conn.layer,
+                opacity: 0,
+                targetOpacity: 0,
+                progress: 0,
+                delay: Math.random() * 800,
+            });
+        });
+
+        let mouseX = canvas.width / 2;
+        let mouseY = canvas.height / 2;
+
+        canvas.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+
+            elementList.forEach(el => {
+                const dx = mouseX - el.x * canvas.width;
+                const dy = mouseY - el.y * canvas.height;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                el.hovered = dist < el.size * 3 && selectedElementId === null && sceneState !== 'interpretive';
+            });
+
+            if (!elementList.some(e => e.hovered)) {
+                canvas.style.cursor = selectedElementId !== null ? 'pointer' : 'default';
+            }
+        });
+
+        canvas.addEventListener('click', (e) => {
+            elementList.forEach(el => {
+                if (el.hovered && el.layer > 0 && evidenceData[el.id]) {
+                    selectElement(el.id, el);
+                }
+            });
+        });
+
+        function renderEvidence(elementId) {
+            const data = evidenceData[elementId];
+            if (!data) return '';
+
+            let html = '';
+
+            data.sections.forEach((section, idx) => {
+                if (section.type === 'account') {
+                    html += `<div class="evidence-label">${section.label}</div>`;
+                    if (section.accounts) {
+                        section.accounts.forEach((account, aidx) => {
+                            html += `<div class="evidence-section">
+                                <div class="evidence-participant">${account.participant}</div>
+                                <div class="evidence-account${aidx > 0 ? ' variant-b' : ''}">${account.content}</div>
+                            </div>`;
+                        });
+                    } else {
+                        html += `<div class="evidence-section">
+                            <div class="evidence-participant">${section.participant}</div>
+                            <div class="evidence-account">${section.content}</div>
+                        </div>`;
+                    }
+                } else if (section.type === 'reading') {
+                    html += `<div class="evidence-label">${section.label}</div>
+                        <div class="evidence-section">
+                            <div class="evidence-reading">${section.content}</div>
+                        </div>`;
+                } else if (section.type === 'connection') {
+                    html += `<div class="evidence-label">${section.label}</div>
+                        <div class="evidence-section">
+                            <div class="evidence-connection">${section.connectionText}</div>`;
+                    if (section.links && section.links.length > 0) {
+                        section.links.forEach(link => {
+                            html += `<div class="connection-link" onclick="selectElement('${link.id}', elements['${link.id}']); event.stopPropagation();">${link.label} →</div>`;
+                        });
+                    }
+                    html += `</div>`;
+                } else if (section.type === 'complication') {
+                    html += `<div class="evidence-label">${section.label}</div>
+                        <div class="evidence-section">`;
+                    if (section.sections) {
+                        section.sections.forEach(subsection => {
+                            html += `<div class="complication-emphasis">${subsection.emphasis}</div>
+                                <div class="evidence-complication">${subsection.content}</div>`;
+                        });
+                    } else {
+                        html += `<div class="evidence-complication">${section.content}</div>`;
+                    }
+                    if (section.followText && section.followLink) {
+                        html += `<div class="connection-link" onclick="selectElement('${section.followLink.id}', elements['${section.followLink.id}']); event.stopPropagation();" style="margin-top: 16px;">${section.followText}</div>`;
+                    }
+                    html += `</div>`;
+                }
+            });
+
+            return html;
+        }
+
+        function selectElement(elementId, el) {
+            selectedElementId = elementId;
+            openEvidenceDrawer(el);
+        }
+
+        function openEvidenceDrawer(el) {
+            const drawer = document.getElementById('evidenceDrawer');
+            drawer.classList.add('open');
+
+            document.getElementById('evidenceNodeName').textContent = el.label;
+            document.getElementById('evidenceContent').innerHTML = renderEvidence(el.id);
+
+            canvasOpacityMultiplier = 0.15;
+
+            elementList.forEach(otherEl => {
+                if (otherEl.id === selectedElementId) {
+                    otherEl.targetOpacity = Math.max(otherEl.targetOpacity, 1);
+                } else {
+                    const isConnected = connectionAnimations.some(c =>
+                        (c.from === selectedElementId && c.to === otherEl.id) ||
+                        (c.to === selectedElementId && c.from === otherEl.id)
+                    );
+                    if (isConnected) {
+                        otherEl.targetOpacity = Math.max(otherEl.targetOpacity, 0.6);
+                    }
+                }
+            });
+
+            canvas.style.cursor = 'default';
+        }
+
+        function closeEvidenceDrawer() {
+            const drawer = document.getElementById('evidenceDrawer');
+            drawer.classList.remove('open');
+            selectedElementId = null;
+            canvasOpacityMultiplier = 1;
+
+            elementList.forEach(el => {
+                if (el.targetOpacity > 0) {
+                    el.targetOpacity = 1;
+                }
+            });
+        }
+
+        document.querySelector('.evidence-close').addEventListener('click', closeEvidenceDrawer);
+
+        document.getElementById('interpretiveOverlay').addEventListener('click', () => {
+            if (sceneState === 'interpretive') {
+                returnToNetwork();
+            }
+        });
+
+        function returnToNetwork() {
+            textElements.interpretiveContainer.classList.remove('visible');
+            textElements.interpretiveOverlay.classList.remove('visible');
+            sceneState = 'exploring';
+            canvasOpacityMultiplier = 1;
+            elementList.forEach(el => {
+                if (el.targetOpacity > 0) el.targetOpacity = 1;
+            });
+        }
+
+        textElements.continuePrompt.addEventListener('click', () => {
+            if (sceneState === 'realization') {
+                textElements.realization.classList.remove('visible');
+                textElements.continuePrompt.classList.remove('visible');
+                sceneState = 'interpretive';
+                textElements.interpretiveContainer.classList.add('visible');
+                textElements.interpretiveOverlay.classList.add('visible');
+                canvasOpacityMultiplier = 0.2;
+            }
+        });
+
+        // Drawing functions
+        function drawElement(el) {
+            if (el.opacity < 0.01) return;
+
+            const x = el.x * canvas.width;
+            const y = el.y * canvas.height;
+            ctx.globalAlpha = el.opacity * canvasOpacityMultiplier;
+
+            if (el.type === 'core') {
+                ctx.save();
+                ctx.translate(x, y);
+
+                ctx.globalAlpha = el.opacity * 0.6 * canvasOpacityMultiplier;
+                ctx.strokeStyle = config.accentLight;
+                ctx.lineWidth = 2;
+
+                ctx.beginPath();
+                ctx.moveTo(-el.size * 0.6, -el.size * 0.7);
+                ctx.lineTo(el.size * 0.6, -el.size * 0.7);
+                ctx.lineTo(el.size * 0.8, el.size * 0.4);
+                ctx.lineTo(0, el.size * 0.8);
+                ctx.lineTo(-el.size * 0.8, el.size * 0.4);
+                ctx.closePath();
+                ctx.stroke();
+
+                ctx.globalAlpha = el.opacity * 0.3 * canvasOpacityMultiplier;
+                ctx.beginPath();
+                ctx.moveTo(-el.size * 0.2, -el.size * 0.3);
+                ctx.lineTo(el.size * 0.2, el.size * 0.3);
+                ctx.stroke();
+
+                ctx.restore();
+
+            } else {
+                const radius = el.size;
+
+                let strokeColor = config.accentDim;
+                let lineWidth = 1.2;
+
+                if (el.category === 'human') {
+                    strokeColor = el.hovered ? config.accentMid : config.accentDim;
+                    lineWidth = el.hovered ? 1.6 : 1.2;
+                } else if (el.category === 'material') {
+                    strokeColor = el.hovered ? config.accentLight : config.accentMid;
+                    lineWidth = el.hovered ? 1.8 : 1.4;
+                } else if (el.category === 'relational') {
+                    strokeColor = el.hovered ? config.accentMid : config.accentDim;
+                    lineWidth = el.hovered ? 1.6 : 1.0;
+                } else if (el.category === 'structural') {
+                    strokeColor = el.hovered ? config.accentMid : config.accentDim;
+                    lineWidth = el.hovered ? 1.5 : 1.1;
+                }
+
+                ctx.globalAlpha = el.opacity * 0.5 * canvasOpacityMultiplier;
+                ctx.strokeStyle = strokeColor;
+                ctx.lineWidth = lineWidth;
+
+                ctx.beginPath();
+                ctx.arc(x, y, radius, 0, Math.PI * 2);
+                ctx.stroke();
+
+                ctx.globalAlpha = el.opacity * 0.3 * canvasOpacityMultiplier;
+                ctx.beginPath();
+                ctx.arc(x, y, radius * 0.6, 0, Math.PI * 2);
+                ctx.stroke();
+
+                if (el.hovered) {
+                    ctx.globalAlpha = el.opacity * 0.15 * canvasOpacityMultiplier;
+                    ctx.fillStyle = strokeColor;
+                    ctx.beginPath();
+                    ctx.arc(x, y, radius, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            // Draw label with offset
+            ctx.globalAlpha = el.opacity * canvasOpacityMultiplier;
+            ctx.fillStyle = config.textColor;
+            ctx.font = '11px -apple-system, BlinkMacSystemFont, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'top';
+
+            const labelX = x + el.labelOffset.x;
+            const labelY = y + el.size + 24 + el.labelOffset.y;
+
+            const lines = el.label.split('\n');
+            const lineHeight = 13;
+
+            lines.forEach((line, idx) => {
+                ctx.fillText(line, labelX, labelY + idx * lineHeight);
+            });
+        }
+
+        function drawConnection(conn, progress) {
+            const fromEl = elements[conn.from];
+            const toEl = elements[conn.to];
+
+            if (!fromEl || !toEl || fromEl.opacity < 0.01 || toEl.opacity < 0.01) return;
+
+            const fromX = fromEl.x * canvas.width;
+            const fromY = fromEl.y * canvas.height;
+            const toX = toEl.x * canvas.width;
+            const toY = toEl.y * canvas.height;
+
+            ctx.globalAlpha = conn.opacity * conn.strength * 0.4 * canvasOpacityMultiplier;
+            ctx.strokeStyle = config.traceColor;
+            ctx.lineWidth = 0.8;
+
+            ctx.beginPath();
+            ctx.moveTo(fromX, fromY);
+
+            const cp1X = (fromX + toX) / 2 + Math.sin(progress) * 40;
+            const cp1Y = (fromY + toY) / 2 - Math.cos(progress) * 40;
+
+            if (progress < 1) {
+                const endProgress = Math.min(1, progress * 1.3);
+                const endX = fromX + (toX - fromX) * endProgress;
+                const endY = fromY + (toY - fromY) * endProgress;
+                ctx.bezierCurveTo(
+                    fromX + (cp1X - fromX) * Math.min(1, progress * 1.2),
+                    fromY + (cp1Y - fromY) * Math.min(1, progress * 1.2),
+                    toX - (toX - cp1X) * Math.max(0, 1 - progress),
+                    toY - (toY - cp1Y) * Math.max(0, 1 - progress),
+                    endX,
+                    endY
+                );
+            } else {
+                ctx.bezierCurveTo(cp1X, cp1Y, cp1X, cp1Y, toX, toY);
+            }
+
+            ctx.stroke();
+        }
+
+        // Main animation loop
+        function animate() {
+            ctx.fillStyle = config.backgroundColor;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            stateTime += 1000 / 60;
+
+            // STATE MACHINE
+
+            if (sceneState === 'beat1') {
+                elements.publication.targetOpacity = Math.min(1, stateTime / 1000);
+
+                if (stateTime > timings.questionAppear) {
+                    textElements.question.classList.add('visible');
+                }
+
+                if (stateTime > timings.connectionEmergence) {
+                    const pubDataConn = connectionAnimations.find(c => c.from === 'publication' && c.to === 'data');
+                    if (pubDataConn) {
+                        const connProgress = Math.min(1, (stateTime - timings.connectionEmergence) / 1200);
+                        pubDataConn.targetOpacity = connProgress;
+                        pubDataConn.progress = connProgress;
+                    }
+                }
+
+                if (stateTime > timings.dataAppear) {
+                    elements.data.targetOpacity = Math.min(1, (stateTime - timings.dataAppear) / 800);
+                }
+
+                if (stateTime > timings.beat2Delay) {
+                    sceneState = 'beat2';
+                }
+            }
+
+            if (sceneState === 'beat2') {
+                const timeSinceBeat2 = stateTime - timings.beat2Delay;
+                elements.technicalJudgement.targetOpacity = Math.min(1, timeSinceBeat2 / 1000);
+                elements.method.targetOpacity = Math.min(1, (timeSinceBeat2 - 100) / 1000);
+                elements.equipment.targetOpacity = Math.min(1, (timeSinceBeat2 - 200) / 1000);
+                elements.time.targetOpacity = Math.min(1, (timeSinceBeat2 - 300) / 1000);
+
+                connectionAnimations.forEach(conn => {
+                    if (conn.layer === 1 && conn.from !== 'publication') {
+                        const delayedStart = timings.beat2Delay + 800 + conn.delay;
+                        if (stateTime > delayedStart) {
+                            const connProgress = Math.min(1, (stateTime - delayedStart) / 1000);
+                            conn.targetOpacity = Math.min(1, connProgress * conn.strength);
+                            conn.progress = connProgress;
+                        }
+                    }
+                });
+
+                if (stateTime > timings.beat3Delay) {
+                    sceneState = 'beat3';
+                }
+            }
+
+            if (sceneState === 'beat3') {
+                const timeSinceBeat3 = stateTime - timings.beat3Delay;
+                elements.maintenance.targetOpacity = Math.min(1, timeSinceBeat3 / 1000);
+                elements.access.targetOpacity = Math.min(1, (timeSinceBeat3 - 80) / 1000);
+                elements.expertise.targetOpacity = Math.min(1, (timeSinceBeat3 - 160) / 1000);
+                elements.training.targetOpacity = Math.min(1, (timeSinceBeat3 - 240) / 1000);
+                elements.communication.targetOpacity = Math.min(1, (timeSinceBeat3 - 320) / 1000);
+                elements.relationships.targetOpacity = Math.min(1, (timeSinceBeat3 - 400) / 1000);
+                elements.troubleshooting.targetOpacity = Math.min(1, (timeSinceBeat3 - 480) / 1000);
+
+                connectionAnimations.forEach(conn => {
+                    if (conn.layer === 2) {
+                        const delayedStart = timings.beat3Delay + 700 + conn.delay;
+                        if (stateTime > delayedStart) {
+                            const connProgress = Math.min(1, (stateTime - delayedStart) / 1000);
+                            conn.targetOpacity = Math.min(1, connProgress * conn.strength);
+                            conn.progress = connProgress;
+                        }
+                    }
+                });
+
+                if (stateTime > timings.beat4Delay) {
+                    sceneState = 'beat4';
+                }
+            }
+
+            if (sceneState === 'beat4') {
+                const timeSinceBeat4 = stateTime - timings.beat4Delay;
+                elements.funding.targetOpacity = Math.min(1, timeSinceBeat4 / 900);
+                elements.employment.targetOpacity = Math.min(1, (timeSinceBeat4 - 70) / 900);
+                elements.institutional.targetOpacity = Math.min(1, (timeSinceBeat4 - 140) / 900);
+                elements.recognition.targetOpacity = Math.min(1, (timeSinceBeat4 - 210) / 900);
+                elements.assessment.targetOpacity = Math.min(1, (timeSinceBeat4 - 280) / 900);
+                elements.organisationalMemory.targetOpacity = Math.min(1, (timeSinceBeat4 - 350) / 900);
+
+                connectionAnimations.forEach(conn => {
+                    if (conn.layer === 3) {
+                        const delayedStart = timings.beat4Delay + 600 + conn.delay;
+                        if (stateTime > delayedStart) {
+                            const connProgress = Math.min(1, (stateTime - delayedStart) / 1000);
+                            conn.targetOpacity = Math.min(1, connProgress * conn.strength);
+                            conn.progress = connProgress;
+                        }
+                    }
+                });
+
+                if (stateTime > timings.realizationDelay) {
+                    sceneState = 'realization';
+                    textElements.question.classList.remove('visible');
+                }
+            }
+
+            if (sceneState === 'realization') {
+                const timeInRealization = stateTime - timings.realizationDelay;
+
+                if (timeInRealization < 1000) {
+                    networkOpacity = Math.max(0.4, networkOpacity - 0.02);
+                } else {
+                    textElements.realization.classList.add('visible');
+                }
+
+                if (timeInRealization > timings.realizationHoldMin - 500) {
+                    textElements.continuePrompt.classList.add('visible');
+                }
+            }
+
+            if (sceneState === 'interpretive' && stateTime > timings.interpretiveDelay) {
+                // interpretive state handled by continue click
+            }
+
+            // Update opacities
+            elementList.forEach(el => {
+                el.opacity += (el.targetOpacity - el.opacity) * 0.12;
+            });
+
+            connectionAnimations.forEach(conn => {
+                conn.opacity += (conn.targetOpacity - conn.opacity) * 0.1;
+            });
+
+            // Draw
+            connectionAnimations.forEach(conn => {
+                drawConnection(conn, conn.progress);
+            });
+
+            elementList.forEach(el => {
+                drawElement(el);
+            });
+
+            ctx.globalAlpha = 1;
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        animate();
+    </script>
+</body>
+</html>
