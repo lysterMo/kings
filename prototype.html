@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WHERE YOU STAND</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #0a0a0a;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+            color: #d8d8d8;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            background: #0a0a0a;
+        }
+
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .text-layer {
+            position: absolute;
+            font-size: 18px;
+            font-weight: 300;
+            line-height: 1.4;
+            letter-spacing: 0.3px;
+            opacity: 0;
+            transition: opacity 0.9s ease;
+        }
+
+        .text-layer.visible {
+            opacity: 1;
+        }
+
+        #titleText {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 56px;
+            font-weight: 300;
+            letter-spacing: 2px;
+            text-align: center;
+            width: 100%;
+        }
+
+        #questionText {
+            top: 12%;
+            left: 50%;
+            transform: translateX(-50%);
+            max-width: 700px;
+            font-size: 24px;
+            font-weight: 300;
+            line-height: 1.5;
+            letter-spacing: 0.4px;
+            text-align: center;
+            width: 90%;
+            opacity: 0;
+            transition: opacity 1.2s ease 0.4s;
+        }
+
+        #questionText.visible {
+            opacity: 0.6;
+        }
+
+        #questionText.fade {
+            opacity: 0;
+            transition: opacity 1.5s ease;
+        }
+
+        #cta {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 15px;
+            font-weight: 400;
+            letter-spacing: 0.8px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.7s ease;
+            pointer-events: none;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        #cta.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        #cta:hover {
+            opacity: 0.6;
+        }
+
+        @media (max-width: 1024px) {
+            #titleText {
+                font-size: 42px;
+            }
+            #questionText {
+                font-size: 20px;
+                top: 10%;
+            }
+            #cta {
+                bottom: 60px;
+                font-size: 14px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .text-layer, #cta {
+                transition: opacity 0.2s ease;
+            }
+        }
+
+        @media (prefers-contrast: more) {
+            body {
+                background: #000000;
+            }
+            .text-layer, #cta {
+                color: #ffffff;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="scene"></canvas>
+    <div id="overlay">
+        <div id="titleText" class="text-layer">WHERE YOU STAND</div>
+        <div id="questionText" class="text-layer">What does a research system make visible?</div>
+        <div id="cta" class="text-layer"><a href="scene2.html">TRACE IT BACKWARDS →</a></div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('scene');
+        const ctx = canvas.getContext('2d', { alpha: true });
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const config = {
+            backgroundColor: '#0a0a0a',
+            accentLight: '#e8d4b8',
+            accentMid: '#c9a961',
+            accentDim: '#6b5d47',
+            textColor: '#d8d8d8',
+            textDim: '#5a5a5a',
+            traceColor: '#3a3a3a',
+        };
+
+        const textElements = {
+            title: document.getElementById('titleText'),
+            question: document.getElementById('questionText'),
+            cta: document.getElementById('cta'),
+        };
+
+        // ===== INVISIBLE INFRASTRUCTURE =====
+
+        const infrastructure = {
+            nodes: [],
+            connections: [],
+            traces: [],
+        };
+
+        function generateInfrastructure() {
+            // 50 nodes scattered across field
+            for (let i = 0; i < 50; i++) {
+                infrastructure.nodes.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    baseX: Math.random() * canvas.width,
+                    baseY: Math.random() * canvas.height,
+                    depth: Math.random(),
+                    size: 0.5 + Math.random() * 2,
+                    opacity: 0,
+                    targetOpacity: 0,
+                    vx: (Math.random() - 0.5) * 0.02,
+                    vy: (Math.random() - 0.5) * 0.02,
+                    drift: Math.random() * Math.PI * 2,
+                    driftSpeed: 0.0003 + Math.random() * 0.0002,
+                    pulse: Math.random() * Math.PI * 2,
+                    pulseSpeed: 0.008 + Math.random() * 0.005,
+                    pointerInfluence: 0,
+                });
+            }
+
+            // Sparse connections (way fewer)
+            for (let i = 0; i < 40; i++) {
+                const from = Math.floor(Math.random() * infrastructure.nodes.length);
+                const to = Math.floor(Math.random() * infrastructure.nodes.length);
+                if (from !== to) {
+                    infrastructure.connections.push({
+                        fromIdx: from,
+                        toIdx: to,
+                        opacity: 0,
+                        targetOpacity: 0,
+                        flicker: Math.random() * Math.PI * 2,
+                        flickerSpeed: 0.015 + Math.random() * 0.01,
+                        strength: 0.3 + Math.random() * 0.7,
+                    });
+                }
+            }
+
+            // Very few traces (8-10 total)
+            for (let i = 0; i < 8; i++) {
+                const pointCount = 2 + Math.floor(Math.random() * 2);
+                const points = [];
+                let x = Math.random() * canvas.width;
+                let y = Math.random() * canvas.height;
+                for (let p = 0; p < pointCount; p++) {
+                    points.push({ x, y });
+                    x += (Math.random() - 0.5) * 400;
+                    y += (Math.random() - 0.5) * 400;
+                    x = Math.max(0, Math.min(canvas.width, x));
+                    y = Math.max(0, Math.min(canvas.height, y));
+                }
+                infrastructure.traces.push({
+                    points,
+                    opacity: 0,
+                    targetOpacity: 0,
+                    age: 0,
+                    maxAge: 10000 + Math.random() * 5000,
+                    cycleDelay: Math.random() * 3000,
+                });
+            }
+        }
+
+        generateInfrastructure();
+
+        // ===== VISIBLE OBJECTS =====
+
+        const objects = [
+            {
+                name: 'PUBLICATION',
+                x: 0.25,
+                y: 0.32,
+                type: 'sharp',
+                prominence: 'high',
+                appearanceDelay: 1800,
+                appearanceDuration: 1000,
+            },
+            {
+                name: '£1M\nGRANT',
+                x: 0.78,
+                y: 0.28,
+                type: 'contained',
+                prominence: 'high',
+                appearanceDelay: 2400,
+                appearanceDuration: 1000,
+            },
+            {
+                name: 'RESEARCH\nCAREER',
+                x: 0.18,
+                y: 0.75,
+                type: 'trajectory',
+                prominence: 'medium',
+                appearanceDelay: 3000,
+                appearanceDuration: 1200,
+            },
+            {
+                name: 'IMPACT',
+                x: 0.72,
+                y: 0.68,
+                type: 'ripple',
+                prominence: 'medium',
+                appearanceDelay: 3600,
+                appearanceDuration: 1200,
+            },
+            {
+                name: 'KNOWLEDGE',
+                x: 0.52,
+                y: 0.12,
+                type: 'shifting',
+                prominence: 'low',
+                appearanceDelay: 4200,
+                appearanceDuration: 1400,
+            },
+        ];
+
+        objects.forEach((obj, idx) => {
+            obj.baseX = obj.x * canvas.width;
+            obj.baseY = obj.y * canvas.height;
+            obj.currentX = obj.baseX;
+            obj.currentY = obj.baseY;
+            obj.opacity = 0;
+            obj.targetOpacity = 0;
+            obj.hovered = false;
+            obj.hoveredTime = 0;
+            obj.selected = false;
+            obj.size = obj.prominence === 'high' ? 40 : (obj.prominence === 'medium' ? 32 : 28);
+            obj.rotation = Math.random() * Math.PI * 2;
+            obj.drift = Math.random() * Math.PI * 2;
+            obj.driftSpeed = 0.0015 + Math.random() * 0.001;
+            obj.infrastructureConnections = [];
+            obj.publicationConnections = []; // Specifically for publication traces
+        });
+
+        // Connect objects to infrastructure
+        objects.forEach((obj, objIdx) => {
+            const connectionCount = 3 + Math.floor(Math.random() * 2);
+            for (let i = 0; i < connectionCount; i++) {
+                const nodeIdx = Math.floor(Math.random() * infrastructure.nodes.length);
+                obj.infrastructureConnections.push(nodeIdx);
+            }
+
+            // For publication, select specific outward connections
+            if (obj.name === 'PUBLICATION') {
+                obj.publicationConnections = obj.infrastructureConnections.slice(0, 3);
+            }
+        });
+
+        // State machine
+        let sceneState = 'start';
+        let stateTime = 0;
+        let selectedObjectIndex = -1;
+
+        const timings = {
+            titleAppear: 600,
+            titleStay: 3000,
+            questionAppear: 3700,
+            questionStay: 4800,
+            infrastructureFadeStart: 5000,
+            infrastructureFadeDuration: 3000,
+            hoverRevealDelay: 250,
+        };
+
+        // Mouse tracking
+        let mouseX = canvas.width / 2;
+        let mouseY = canvas.height / 2;
+
+        canvas.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+
+            objects.forEach((obj) => {
+                const dx = mouseX - obj.currentX;
+                const dy = mouseY - obj.currentY;
+                obj.pointerDistance = Math.sqrt(dx * dx + dy * dy);
+                const wasHovered = obj.hovered;
+                obj.hovered = obj.pointerDistance < obj.size * 3.5;
+                if (obj.hovered && !wasHovered) {
+                    obj.hoveredTime = 0;
+                }
+            });
+
+            if (objects.some(o => o.hovered)) {
+                canvas.style.cursor = 'pointer';
+            } else {
+                canvas.style.cursor = 'default';
+            }
+        });
+
+        canvas.addEventListener('click', (e) => {
+            objects.forEach((obj, idx) => {
+                if (obj.hovered && sceneState !== 'selectedObject') {
+                    selectObject(idx);
+                }
+            });
+        });
+
+        function selectObject(index) {
+            selectedObjectIndex = index;
+            sceneState = 'selectedObject';
+            if (objects[index].name === 'PUBLICATION') {
+                setTimeout(() => {
+                    textElements.cta.classList.add('visible');
+                }, 400);
+            }
+            objects.forEach((obj, idx) => {
+                obj.selected = idx === index;
+            });
+        }
+
+        // ===== RENDERING FUNCTIONS =====
+
+        function drawSharp(x, y, size, opacity, rotation) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(rotation);
+
+            ctx.globalAlpha = opacity * 0.7;
+            ctx.strokeStyle = config.accentLight;
+            ctx.lineWidth = 2;
+
+            ctx.beginPath();
+            ctx.moveTo(-size * 0.6, -size * 0.7);
+            ctx.lineTo(size * 0.6, -size * 0.7);
+            ctx.lineTo(size * 0.8, size * 0.4);
+            ctx.lineTo(0, size * 0.8);
+            ctx.lineTo(-size * 0.8, size * 0.4);
+            ctx.closePath();
+            ctx.stroke();
+
+            ctx.globalAlpha = opacity * 0.4;
+            ctx.beginPath();
+            ctx.moveTo(-size * 0.2, -size * 0.3);
+            ctx.lineTo(size * 0.2, size * 0.3);
+            ctx.stroke();
+
+            ctx.restore();
+        }
+
+        function drawContained(x, y, size, opacity, rotation, pulse) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(rotation);
+
+            const pulseScale = 0.9 + Math.sin(pulse) * 0.12;
+
+            ctx.globalAlpha = opacity * 0.5;
+            ctx.strokeStyle = config.accentMid;
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.arc(0, 0, size * pulseScale, 0, Math.PI * 2);
+            ctx.stroke();
+
+            ctx.globalAlpha = opacity * 0.3;
+            ctx.beginPath();
+            ctx.arc(0, 0, size * 0.5 * pulseScale, 0, Math.PI * 2);
+            ctx.stroke();
+
+            for (let i = 0; i < 5; i++) {
+                const angle = (i / 5) * Math.PI * 2;
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.lineTo(Math.cos(angle) * size * pulseScale, Math.sin(angle) * size * pulseScale);
+                ctx.stroke();
+            }
+
+            ctx.restore();
+        }
+
+        function drawTrajectory(x, y, size, opacity, drift) {
+            ctx.save();
+            ctx.translate(x, y);
+
+            const pathLength = 4;
+            const path = [];
+
+            for (let i = 0; i < pathLength; i++) {
+                const angle = drift + (i / pathLength) * Math.PI * 0.7;
+                const r = (i / pathLength) * size * 1.1;
+                path.push({
+                    x: Math.cos(angle) * r,
+                    y: Math.sin(angle) * r,
+                    progress: i / pathLength,
+                });
+            }
+
+            ctx.globalAlpha = opacity * 0.5;
+            ctx.strokeStyle = config.accentMid;
+            ctx.lineWidth = 1.2;
+            ctx.beginPath();
+            ctx.moveTo(path[0].x, path[0].y);
+
+            for (let i = 1; i < path.length; i++) {
+                ctx.lineTo(path[i].x, path[i].y);
+            }
+            ctx.stroke();
+
+            ctx.globalAlpha = opacity * 0.4;
+            path.forEach((pt) => {
+                ctx.beginPath();
+                ctx.arc(pt.x, pt.y, 1.2 + pt.progress * 1, 0, Math.PI * 2);
+                ctx.fillStyle = config.accentMid;
+                ctx.fill();
+            });
+
+            ctx.restore();
+        }
+
+        function drawRipple(x, y, size, opacity, pulse) {
+            ctx.save();
+            ctx.translate(x, y);
+
+            const rippleCount = 3;
+            for (let r = 0; r < rippleCount; r++) {
+                const age = (pulse + r * Math.PI * 0.6) % (Math.PI * 2);
+                const radius = (age / (Math.PI * 2)) * size * 1.4;
+                const alpha = opacity * 0.5 * (1 - age / (Math.PI * 2));
+
+                ctx.globalAlpha = alpha;
+                ctx.strokeStyle = config.accentLight;
+                ctx.lineWidth = 0.9;
+                ctx.beginPath();
+                ctx.arc(0, 0, radius, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+
+            ctx.globalAlpha = opacity * 0.6;
+            ctx.fillStyle = config.accentLight;
+            ctx.beginPath();
+            ctx.arc(0, 0, 1.8, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        function drawShifting(x, y, size, opacity, rotation, pulse) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(rotation);
+
+            const fragmentCount = 5;
+            const baseAngle = pulse;
+
+            ctx.globalAlpha = opacity * 0.35;
+            ctx.strokeStyle = config.accentDim;
+            ctx.lineWidth = 1;
+
+            for (let f = 0; f < fragmentCount; f++) {
+                const angle = baseAngle + (f / fragmentCount) * Math.PI * 2;
+                const offsetX = Math.cos(angle) * (size * 0.35 + Math.sin(pulse * 0.4) * 2);
+                const offsetY = Math.sin(angle) * (size * 0.35 + Math.cos(pulse * 0.4) * 2);
+
+                const fSize = size * 0.45 + Math.sin(pulse + f * 0.5) * 1.5;
+
+                ctx.beginPath();
+                ctx.arc(offsetX, offsetY, fSize, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+
+            for (let p = 0; p < 5; p++) {
+                const angle = pulse * 0.2 + (p / 5) * Math.PI * 2;
+                const px = Math.cos(angle) * size * 0.5;
+                const py = Math.sin(angle) * size * 0.5;
+
+                ctx.globalAlpha = opacity * 0.2;
+                ctx.fillStyle = config.accentDim;
+                ctx.beginPath();
+                ctx.arc(px, py, 0.6, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            ctx.restore();
+        }
+
+        // ===== MAIN ANIMATION LOOP =====
+
+        function animate() {
+            ctx.fillStyle = config.backgroundColor;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            stateTime += 1000 / 60;
+
+            // STATE TRANSITIONS
+            if (sceneState === 'start' && stateTime > timings.titleAppear) {
+                textElements.title.classList.add('visible');
+                sceneState = 'titleVisible';
+            }
+
+            if (sceneState === 'titleVisible' && stateTime > timings.titleAppear + timings.titleStay) {
+                textElements.title.classList.remove('visible');
+                textElements.question.classList.add('visible');
+                sceneState = 'questionVisible';
+            }
+
+            if (sceneState === 'questionVisible' && stateTime > timings.questionAppear + timings.questionStay) {
+                textElements.question.classList.add('fade');
+                sceneState = 'objectsAppearing';
+            }
+
+            if (sceneState === 'objectsAppearing' && stateTime > timings.questionAppear + timings.questionStay + 1500) {
+                textElements.question.classList.remove('visible', 'fade');
+                sceneState = 'exploring';
+            }
+
+            // ===== DRAW INFRASTRUCTURE (EXTREMELY SPARSE AT REST) =====
+
+            const infraFadeProgress = Math.max(0, Math.min(1, (stateTime - timings.infrastructureFadeStart) / timings.infrastructureFadeDuration));
+
+            // Calculate pointer influence radius
+            const pointerRadius = 280;
+            const pointerInfluenceStrength = 0.35;
+
+            infrastructure.nodes.forEach(node => {
+                // Distance from mouse
+                const dx = mouseX - node.x;
+                const dy = mouseY - node.y;
+                const pointerDist = Math.sqrt(dx * dx + dy * dy);
+
+                // Pointer proximity reveal (soft falloff)
+                const pointerReveal = Math.max(0, 1 - pointerDist / pointerRadius) * pointerInfluenceStrength;
+
+                // Distance from objects (only when exploring)
+                let objectInfluence = 0;
+                if (sceneState === 'exploring' || sceneState === 'selectedObject') {
+                    objects.forEach(obj => {
+                        if (obj.opacity > 0.2) {
+                            const ox = obj.currentX - node.x;
+                            const oy = obj.currentY - node.y;
+                            const objDist = Math.sqrt(ox * ox + oy * oy);
+                            objectInfluence += Math.max(0, (1 - objDist / 350) * 0.12);
+                        }
+                    });
+                }
+
+                // VERY LOW resting visibility
+                const restingOpacity = 0.02;
+
+                // Base visibility is almost nothing
+                node.targetOpacity = restingOpacity + pointerReveal * 0.4 + objectInfluence * 0.25;
+                node.opacity += (node.targetOpacity - node.opacity) * 0.08;
+
+                // Extreme slowness
+                node.drift += node.driftSpeed;
+                node.x = node.baseX + Math.cos(node.drift) * 15 + Math.sin(node.drift * 0.4) * 10;
+                node.y = node.baseY + Math.sin(node.drift) * 15 + Math.cos(node.drift * 0.4) * 10;
+
+                // Pulse
+                node.pulse += node.pulseSpeed;
+                const pulseAlpha = 0.6 + Math.sin(node.pulse) * 0.4;
+
+                ctx.globalAlpha = node.opacity * pulseAlpha * 0.7;
+                const depthScale = 0.3 + node.depth * 0.7;
+                ctx.fillStyle = config.traceColor;
+                ctx.beginPath();
+                ctx.arc(node.x, node.y, node.size * depthScale, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            // Draw connections (very sparse, mostly invisible)
+            infrastructure.connections.forEach(conn => {
+                const fromNode = infrastructure.nodes[conn.fromIdx];
+                const toNode = infrastructure.nodes[conn.toIdx];
+
+                if (fromNode && toNode) {
+                    // Flicker effect
+                    conn.flicker += conn.flickerSpeed;
+                    const flicker = Math.abs(Math.sin(conn.flicker));
+
+                    conn.targetOpacity = (fromNode.opacity + toNode.opacity) * 0.15 * flicker * conn.strength * 0.4;
+                    conn.opacity += (conn.targetOpacity - conn.opacity) * 0.1;
+
+                    if (conn.opacity > 0.005) {
+                        ctx.globalAlpha = conn.opacity;
+                        ctx.strokeStyle = config.traceColor;
+                        ctx.lineWidth = 0.4;
+                        ctx.beginPath();
+                        ctx.moveTo(fromNode.x, fromNode.y);
+                        ctx.lineTo(toNode.x, toNode.y);
+                        ctx.stroke();
+                    }
+                }
+            });
+
+            // Draw traces (very sparse, cyclic)
+            infrastructure.traces.forEach((trace, traceIdx) => {
+                const adjustedAge = Math.max(0, trace.age - trace.cycleDelay);
+                const ageProgress = (adjustedAge % trace.maxAge) / trace.maxAge;
+
+                if (adjustedAge >= 0) {
+                    const alpha = Math.sin(ageProgress * Math.PI) * 0.15;
+                    trace.targetOpacity = infraFadeProgress * alpha;
+                } else {
+                    trace.targetOpacity = 0;
+                }
+
+                trace.age += 1000 / 60;
+                trace.opacity += (trace.targetOpacity - trace.opacity) * 0.06;
+
+                if (trace.opacity > 0.005) {
+                    ctx.globalAlpha = trace.opacity;
+                    ctx.strokeStyle = config.traceColor;
+                    ctx.lineWidth = 0.6;
+                    ctx.beginPath();
+
+                    trace.points.forEach((pt, idx) => {
+                        if (idx === 0) {
+                            ctx.moveTo(pt.x, pt.y);
+                        } else {
+                            ctx.lineTo(pt.x, pt.y);
+                        }
+                    });
+                    ctx.stroke();
+                }
+            });
+
+            // ===== DRAW VISIBLE OBJECTS =====
+
+            objects.forEach((obj, idx) => {
+                // Update opacity based on state
+                if (sceneState === 'objectsAppearing' || sceneState === 'exploring' || sceneState === 'selectedObject') {
+                    const timeSinceAppearance = stateTime - obj.appearanceDelay;
+                    if (timeSinceAppearance > 0) {
+                        obj.targetOpacity = Math.min(1, timeSinceAppearance / obj.appearanceDuration);
+                    } else {
+                        obj.targetOpacity = 0;
+                    }
+                } else {
+                    obj.targetOpacity = 0;
+                }
+
+                obj.opacity += (obj.targetOpacity - obj.opacity) * 0.12;
+
+                // Movement
+                if (obj.hovered && !obj.selected) {
+                    obj.hoveredTime += 1000 / 60;
+                    const dx = mouseX - obj.currentX;
+                    const dy = mouseY - obj.currentY;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist > 5) {
+                        obj.currentX += dx * 0.1;
+                        obj.currentY += dy * 0.1;
+                    }
+                } else if (!obj.selected) {
+                    obj.hoveredTime = 0;
+                    obj.currentX += (obj.baseX - obj.currentX) * 0.018;
+                    obj.currentY += (obj.baseY - obj.currentY) * 0.018;
+
+                    // Minimal drift
+                    obj.drift += obj.driftSpeed;
+                    obj.currentX += Math.sin(obj.drift) * 0.2;
+                    obj.currentY += Math.cos(obj.drift * 0.6) * 0.15;
+                } else {
+                    const centerX = canvas.width / 2;
+                    const centerY = canvas.height / 2;
+                    obj.currentX += (centerX - obj.currentX) * 0.03;
+                    obj.currentY += (centerY - obj.currentY) * 0.03;
+                }
+
+                // Rotation
+                obj.rotation += 0.001 + (obj.hovered ? 0.004 : 0);
+
+                // Draw object
+                ctx.globalAlpha = obj.opacity;
+
+                if (obj.type === 'sharp') {
+                    drawSharp(obj.currentX, obj.currentY, obj.size, obj.opacity, obj.rotation);
+                } else if (obj.type === 'contained') {
+                    drawContained(obj.currentX, obj.currentY, obj.size, obj.opacity, obj.rotation, stateTime * 0.003);
+                } else if (obj.type === 'trajectory') {
+                    drawTrajectory(obj.currentX, obj.currentY, obj.size, obj.opacity, obj.drift);
+                } else if (obj.type === 'ripple') {
+                    drawRipple(obj.currentX, obj.currentY, obj.size, obj.opacity, stateTime * 0.004);
+                } else if (obj.type === 'shifting') {
+                    drawShifting(obj.currentX, obj.currentY, obj.size, obj.opacity, obj.rotation, stateTime * 0.0035 + idx);
+                }
+
+                // Label
+                ctx.globalAlpha = obj.opacity;
+                ctx.fillStyle = config.textColor;
+                ctx.font = '12px -apple-system, BlinkMacSystemFont, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'top';
+
+                const lines = obj.name.split('\n');
+                const lineHeight = 14;
+                const startY = obj.currentY + obj.size + 28;
+
+                lines.forEach((line, lineIdx) => {
+                    const y = startY + lineIdx * lineHeight;
+                    ctx.fillText(line, obj.currentX, y);
+                });
+
+                // ===== PUBLICATION-SPECIFIC TRACES =====
+
+                if (obj.name === 'PUBLICATION' && obj.hovered && obj.hoveredTime > timings.hoverRevealDelay && obj.opacity > 0.3) {
+                    // Show 3 faint traces disappearing into darkness
+                    ctx.globalAlpha = 0.18;
+                    ctx.strokeStyle = config.accentMid;
+                    ctx.lineWidth = 1;
+
+                    obj.publicationConnections.forEach((nodeIdx, connIdx) => {
+                        const node = infrastructure.nodes[nodeIdx];
+                        if (node) {
+                            const targetX = node.x + Math.cos(stateTime * 0.0003 + connIdx) * 400;
+                            const targetY = node.y + Math.sin(stateTime * 0.0002 + connIdx) * 400;
+
+                            ctx.beginPath();
+                            ctx.moveTo(obj.currentX, obj.currentY);
+
+                            // Bezier to create gentle curve
+                            const cp1X = (obj.currentX + node.x) / 2 + Math.cos(connIdx) * 50;
+                            const cp1Y = (obj.currentY + node.y) / 2 + Math.sin(connIdx) * 50;
+
+                            ctx.bezierCurveTo(cp1X, cp1Y, node.x, node.y, targetX, targetY);
+                            ctx.stroke();
+                        }
+                    });
+                }
+
+                // ===== OTHER OBJECTS: OBJECT DISTURBANCE VISUALIZATION =====
+
+                else if (obj.opacity > 0.5 && (obj.type === 'contained' || obj.type === 'ripple' || obj.type === 'trajectory')) {
+                    // Subtle disturbance effect: nearby hidden nodes become slightly more perceptible
+                    const disturbanceRadius = 300;
+                    infrastructure.nodes.forEach(node => {
+                        const dx = obj.currentX - node.x;
+                        const dy = obj.currentY - node.y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+
+                        if (dist < disturbanceRadius) {
+                            const influence = (1 - dist / disturbanceRadius) * 0.08 * obj.opacity;
+                            node.targetOpacity = Math.max(node.targetOpacity, node.targetOpacity + influence);
+                        }
+                    });
+                }
+            });
+
+            ctx.globalAlpha = 1;
+
+            requestAnimationFrame(animate);
+        }
+
+        // Handle resize
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        animate();
+    </script>
+</body>
+</html>
