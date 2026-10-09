@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Research culture: seen from where?</title>
+<style>
+:root{--navy:#043047;--pink:#ef168d;--ink:#f5f5f1;--teal:#21b7ac;--sky:#74b7df;--violet:#a281ce;--yellow:#f2ce35;--mute:#c5dbe3;--line:#ffffff33}
+*{box-sizing:border-box}
+body{margin:0;background:var(--navy);color:var(--ink);font:18px/1.6 "Helvetica Neue",Arial,sans-serif}
+main{max-width:1000px;margin:auto;padding:0 22px}
+section{padding:72px 0 56px;border-bottom:1px solid var(--line)}
+h1{font-size:clamp(44px,9vw,100px);line-height:1;letter-spacing:-.04em;margin:.3em 0;max-width:900px}
+h1 span,h2{color:var(--pink)}
+h2{font-size:clamp(30px,5.5vw,52px);line-height:1.1;letter-spacing:-.03em;margin:.2em 0 .5em;max-width:860px}
+h3{font-size:21px;line-height:1.25;margin:0 0 .4em}
+p{max-width:700px}
+.kicker{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--yellow);margin:0}
+.note,small{font-size:14px;color:var(--mute)}
+.next{margin-top:36px;font-size:19px}.next a{color:var(--yellow);text-underline-offset:4px}
+nav ol{list-style:none;display:flex;flex-wrap:wrap;gap:6px 18px;padding:0;margin:26px 0 0;font-size:14px}
+nav a{color:var(--sky)}
+.art{width:100%;height:auto;display:block;margin:24px 0 8px}
+.hero{width:100vw;margin-left:calc(50% - 50vw);height:clamp(260px,38vw,480px)}body{overflow-x:hidden}
+.net{max-width:620px;margin:16px auto;display:block;width:100%;height:auto}
+.stage{display:grid;grid-template-columns:1fr;gap:12px}
+@media(min-width:900px){.stage{grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:start;gap:32px}.stage .net{margin:0}}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:18px;margin:24px 0}
+.card{padding:22px;border:1px solid var(--line);border-top:3px solid var(--c,var(--teal));border-radius:8px}
+.card p{margin:.4em 0}.q{font-style:italic;color:#fff}
+.btns{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0}
+button{font:inherit;color:var(--ink);background:transparent;border:1px solid var(--teal);border-radius:6px;padding:11px 16px;cursor:pointer;min-height:44px}
+button:hover{background:#176172}button[aria-pressed=true]{background:#176172;border-color:var(--yellow)}
+button[aria-pressed=true]::before{content:"● "}
+:focus-visible{outline:3px solid var(--yellow);outline-offset:3px}
+.panel{padding:16px 20px;border-left:3px solid var(--teal);margin:14px 0}
+.panel ul{margin:.4em 0;padding-left:1.2em}
+details{padding:12px 0;border-top:1px solid var(--line)}summary{cursor:pointer;font-weight:600}
+a{color:#8bd2f5}footer{padding:36px 0;font-size:14px;color:var(--mute)}
+/* svg */
+.net text,.art text{font-family:inherit}
+.ln{fill:none;stroke-width:3}.pill{fill:var(--navy);stroke-width:2.5}
+.pt{fill:var(--ink);font-size:19px;font-weight:700}.lb{fill:var(--mute);font-size:15px;paint-order:stroke;stroke:var(--navy);stroke-width:5px}
+.ftag{display:none;fill:var(--yellow);font-size:14px;font-weight:700}
+.off{opacity:0;visibility:hidden}
+.lens .ln{opacity:.55}.lens .focus .ln{opacity:1}.lens .focus .pill{fill:#0b4a63}.lens .focus .lb{fill:var(--yellow)}.focus .ftag{display:block}
+.c-p{stroke:var(--pink)}.c-m{stroke:var(--teal)}.c-r{stroke:var(--sky)}.c-h{stroke:var(--violet)}.c-x{stroke:var(--yellow)}
+.dl{fill:var(--ink);font-size:20px}.sel text.dl,.dl.sel{font-weight:700;fill:var(--yellow)}
+.dim .ln{opacity:.6}.dim .sel .ln{opacity:1}
+@media(prefers-reduced-motion:no-preference){.off,g,.ln{transition:opacity .35s}}
+@media(max-width:600px){body{font-size:17px}section{padding:52px 0 40px}}
+@media print{body{background:#fff;color:#043047}h1 span,h2{color:#b00c63}button{display:none}.card{break-inside:avoid}.kicker,.note,footer{color:#324c5c}}
+</style></head><body><main>
+
+<section id="top" aria-labelledby="h0"><p class="kicker">Research Culture Across Contexts · An international inquiry</p>
+<h1 id="h0">Research culture.<br><span>Seen from where?</span></h1>
+<p>This experience presents a provisional interpretive synthesis from an international inquiry. It brings together perspectives across research roles and contexts to explore how research becomes possible, recognised and valued. The propositions remain open to qualification, challenge and revision.</p>
+<p class="note">Alys Kay · commissioned by King’s College London · based on the discussion paper of 8 October 2026.</p>
+<svg class="art hero" viewBox="-250 0 1500 600" preserveAspectRatio="xMidYMid slice" role="img" aria-labelledby="ht hd"><title id="ht">Flowing lines crossing and diverging</title><desc id="hd">Decorative coloured lines of different weights flow, bend and cross beneath a translucent teal ribbon; they run off the edges of the frame. They do not encode data.</desc>
+<path d="M-320 330 C-100 260 60 340 200 300 C330 270 400 420 520 335 S800 170 1000 255 S1250 330 1340 270 L1340 360 C1250 420 1000 270 800 270 S640 450 480 435 S160 390 -20 385 S-250 420 -320 400 Z" fill="#21b7ac" opacity=".2"/>
+<path d="M-320 330 C-100 260 60 340 200 300 C330 270 400 420 520 335 S800 170 1000 255 S1250 330 1340 270" fill="none" stroke="#21b7ac" stroke-width="1.5" opacity=".6"/>
+<g fill="none" stroke-linecap="round">
+<path d="M300 -40 C380 120 560 50 650 150 S880 110 1000 30 S1250 -20 1340 40" stroke="#ef168d" stroke-width="2"/>
+<path d="M-320 250 C-200 190 -100 260 0 230 H350 C420 230 420 195 460 230 S520 120 610 195 S750 340 1000 345 S1250 300 1340 380" stroke="#ef168d" stroke-width="6"/>
+<path d="M-320 300 C-200 240 -100 310 0 278 H350 C420 278 420 243 460 278 S520 168 610 243 S750 388 1000 393 S1250 450 1340 520" stroke="#21b7ac" stroke-width="3"/>
+<path d="M-320 400 C-200 330 -80 380 0 326 H300 C400 326 430 220 520 300 S700 470 1000 380 S1250 300 1340 330" stroke="#74b7df" stroke-width="2"/>
+<path d="M-320 470 C-150 520 -80 340 40 374 C250 405 380 295 520 385 S760 570 1000 520 S1250 470 1340 600" stroke="#a281ce" stroke-width="4"/>
+<path d="M-320 560 C-150 600 -40 420 80 430 C200 450 330 530 470 460 C600 395 650 300 570 290 C490 285 520 430 700 480 S900 570 1000 590 S1250 540 1340 640" stroke="#f2ce35" stroke-width="2"/></g></svg>
+<p class="note">Decorative metaphor: line weight, bend, overlap and the teal ribbon are for expression. They do not encode quantities, measured differences or causal links; thickness, length and position carry no meaning anywhere on this page.</p>
+<nav aria-label="Chapters"><ol><li><a href="#s1">1 Output</a></li><li><a href="#s2">2 Positions</a></li><li><a href="#s3">3 Propositions</a></li><li><a href="#s4">4 Decisions</a></li><li><a href="#s5">5 Contexts</a></li><li><a href="#s6">6 Revising</a></li></ol></nav>
+<details id="about"><summary>About this analysis</summary>
+<p>This page communicates a provisional interpretive synthesis. The underlying analysis draws on participant material; the page presents the analyst’s interpretation of it (discussion paper, 8 October 2026), not the material itself.</p>
+<p>All text is analyst paraphrase. No verbatim quotations, participant names, case facts, counts or proportions appear, and nothing here shows how common or how strongly evidenced any idea is. A quotation would be added only after its text, source locator, context and publication permission were checked against primary material; the page’s evidence record is intentionally empty until then.</p>
+<p>The diagrams are illustrative inquiry scaffolds and metaphors. They are not participant cases or proven chains of causation; connections run in several directions, and mediation, feedback and non-linearity are expected. The perspective lenses in chapter 3 are illustrative analytical lenses built from the paper’s propositions; they are not participant accounts, and people in similar roles may see things very differently.</p>
+<p>Paper sections drawn on: standpoint (2); propositions (3.1 to 3.6); mediation and context (4 to 7); revision criteria (8); webpage experiment (10); participatory analysis (12). Chapter-level section references beyond those in the propositions should be confirmed against the paper. This page stores and submits nothing; prompts can be used aloud or in an existing workshop platform.</p></details>
+<p class="next"><a href="#s1">Begin with something you can see →</a></p></section>
+
+<section id="s1" aria-labelledby="h1"><p class="kicker">1 · A visible output</p>
+<h2 id="h1">What had to happen for this to exist?</h2>
+<p>A publication is one place to start. Each click adds contributions and conditions around it. They overlap and influence each other; none sits “below” another.</p>
+<div class="stage"><div>
+<div class="btns"><button id="trace" type="button">Reveal people and judgement</button></div>
+<p class="note" id="tstat">Nothing traced yet.</p>
+<ul id="layerList" aria-live="polite"></ul>
+<p class="note">Illustrative inquiry scaffold (paper sections 3.1 and 10). Not a participant case, not a proven chain of causation, not exhaustive. Labelled connections are examples of relationships to examine; they have no direction or weight.</p></div>
+<div id="net1"></div></div>
+<p class="next"><a href="#s2">Now ask who is looking at this, and from where →</a></p></section>
+
+<section id="s2" aria-labelledby="h2"><p class="kicker">2 · What different positions reveal</p>
+<h2 id="h2">Same activity. Different questions come into view.</h2>
+<p>Choose a perspective. The whole network stays in place; the lens only brings certain questions and relationships into focus.</p>
+<div class="stage"><div>
+<div class="btns" id="lensBtns" role="group" aria-label="Perspectives"></div>
+<div class="panel" id="lensOut" aria-live="polite"></div></div>
+<div id="net2"></div></div>
+<p class="note">Illustrative analytical lens, not a participant account. Each lens is derived from one proposition in section 3 of the paper. People in similar roles may see this very differently, and one person may hold several positions. Everything outside the highlight is still there.</p>
+<p class="next"><a href="#s3">These questions point to six propositions →</a></p></section>
+
+<section id="s3" aria-labelledby="h3"><p class="kicker">3 · The emerging explanation</p>
+<h2 id="h3">Six connected propositions</h2>
+<p>They overlap and work at different levels: analytical constructions being tested, not six equally shared themes and not a consensus. Their order does not signal importance. Open a card for its qualification and source.</p>
+<div class="cards" id="props"></div>
+<p class="next"><a href="#s4">One proposition asks who can actually shape decisions →</a></p></section>
+
+<section id="s4" aria-labelledby="h4"><p class="kicker">4 · Who can shape decisions</p>
+<h2 id="h4">Being present does not settle who decides.</h2>
+<p>Someone becomes involved. Then ask which of these remain open to them. The six lines are listed alphabetically; they are not stages, scores or a ladder, and they can diverge within the same project.</p>
+<div class="btns" id="dimBtns" role="group" aria-label="Dimensions of participation"></div>
+<div class="panel" id="dimOut" aria-live="polite"></div>
+<div id="net3"></div>
+<div class="cards">
+<article class="card" style="--c:var(--pink)"><h3>Participation and authority</h3><p>Taking part is not the same as being able to change the question, the budget or the interpretation. People may still exercise agency through routes the formal arrangements do not show.</p></article>
+<article class="card" style="--c:var(--sky)"><h3>Resources and power</h3><p>Resources can move while control over questions, budgets and interpretation stays elsewhere. Reciprocal arrangements exist; unequal power is not inevitable.</p></article>
+<article class="card" style="--c:var(--violet)"><h3>Formal structures and functioning relationships</h3><p>Formal structures show who is named as responsible. Day-to-day work may rely on relationships and informal labour that they do not show. That labour can signal unequal burden, not a model to copy.</p></article></div>
+<p class="note">Adapted from sections 3.3 and 3.4. Open inquiry questions, not findings.</p>
+<p class="next"><a href="#s5">Next, move the practice into another context →</a></p></section>
+
+<section id="s5" aria-labelledby="h5"><p class="kicker">5 · What changes across contexts</p>
+<h2 id="h5">What travels, and what changes?</h2>
+<p>A practice may travel while its meaning, feasibility, cost and consequences change. Context helps constitute the phenomenon; it is not just a backdrop. Select a point on the path.</p>
+<div class="btns" id="ctxBtns" role="group" aria-label="Questions along the path"></div>
+<div class="panel" id="ctxOut" aria-live="polite"></div>
+<div id="net4"></div>
+<p class="note">Metaphor: overlapping loops are not separate bounded systems or levels, and distant decisions can shape immediate experience. No countries are compared and no best practice is implied. The dashed circle suggests the practice may look different on arrival; some of it may also carry across, or be reshaped through local agency. Terminology, including UK terms, may not travel unchanged. Sections 5 to 7.</p>
+<p class="next"><a href="#s6">Finally, test what this account can and cannot see →</a></p></section>
+
+<section id="s6" aria-labelledby="h6"><p class="kicker">6 · What needs revising</p>
+<h2 id="h6">What can you see that this account cannot?</h2>
+<div class="cards">
+<article class="card" style="--c:var(--teal)"><h3>Strengthen</h3><p>What does the account explain particularly well, and from which position do you see that?</p></article>
+<article class="card" style="--c:var(--yellow)"><h3>Qualify</h3><p>Where does it depend on particular positions, conditions or terminology?</p></article>
+<article class="card" style="--c:var(--pink)"><h3>Challenge</h3><p>What is absent, distorted or inadequately explained? What counterexample would matter?</p></article></div>
+<h3>Still open</h3>
+<ul><li>Which propositions hold, change or fall away when checked against primary material?</li>
+<li>Which contexts, knowledge traditions or practices does this vocabulary fail to see?</li>
+<li>Where do propositions overlap enough that they should be merged, separated or reworded?</li></ul>
+<p>Responses can inform further interpretation. Agreement is not statistical validation, frequency is not significance, disagreement should stay visible, and no one contributor speaks for a country or group.</p>
+<p class="next"><a href="#top">Return to the beginning ↑</a></p></section>
+<footer>Alys Kay · Research Culture Across Contexts · Provisional analytical communication; not yet reviewed against primary evidence for public release.</footer></main>
+<script>
+const P=[{"title": "Infrastructure has a pulse", "interpretation": "Material infrastructure becomes inseparable from judgement, maintenance, coordination, trust and institutional memory.", "question": "What makes a contribution legible as knowledge-producing labour?", "qualification": "Do not romanticise invisible work: it can signal fragility and unequal burden.", "source_section": "3.1", "evidence_status": "Analyst interpretation paraphrased from the discussion paper; primary extracts not supplied"}, {"title": "Systems produce researchers as well as research", "interpretation": "Employment, supervision, access, workload and recognition shape differently distributed conditions for becoming and remaining a knowledge-maker.", "question": "What conditions enable people to enter, develop and remain?", "qualification": "Agency matters; systems do not mechanically determine careers.", "source_section": "3.2", "evidence_status": "Analyst interpretation paraphrased from the discussion paper; primary extracts not supplied"}, {"title": "Participation is not the same as authority", "interpretation": "Presence, voice, influence, authority and ownership can diverge within the same project.", "question": "What was still open to change when someone became involved?", "qualification": "These are dimensions to investigate, not a maturity ladder.", "source_section": "3.3", "evidence_status": "Analyst interpretation paraphrased from the discussion paper; primary extracts not supplied"}, {"title": "Resource transfer is not power transfer", "interpretation": "Resources can move while control over questions, budgets and interpretation remains elsewhere.", "question": "Where did resources move, and where did decision-making remain?", "qualification": "Reciprocal cases matter too; unequal power is not inevitable.", "source_section": "3.4", "evidence_status": "Analyst interpretation paraphrased from the discussion paper; primary extracts not supplied"}, {"title": "Naming changes what can be seen", "interpretation": "Labels can confer legitimacy and resources while obscuring practices that do not fit recognised categories.", "question": "What changes when existing practices acquire a policy label?", "qualification": "Do not presume UK terminology travels unchanged.", "source_section": "3.5", "evidence_status": "Analyst interpretation paraphrased from the discussion paper; primary extracts not supplied"}, {"title": "Knowledge is made somewhere", "interpretation": "Research systems help shape whose knowledge becomes credible, recognised and recoverable.", "question": "Who gets to decide what counts as knowledge?", "qualification": "Keep epistemological differences visible; do not flatten knowledge traditions.", "source_section": "3.6", "evidence_status": "Analyst interpretation paraphrased from the discussion paper; primary extracts not supplied"}];
+const $=id=>document.getElementById(id),NS='http://www.w3.org/2000/svg';
+/* propositions */
+const cl=['--pink','--teal','--sky','--violet','--yellow','--pink'];
+P.forEach((p,i)=>{const a=document.createElement('article');a.className='card';a.style.setProperty('--c','var('+cl[i]+')');
+a.innerHTML='<h3></h3><p></p><p class="q"></p><details><summary>Qualification and source</summary><p></p></details>';
+const [h,i1,q,d]=[a.querySelector('h3'),a.children[1],a.children[2],a.querySelector('details p')];
+h.textContent=p.title;i1.textContent=p.interpretation;q.textContent=p.question;d.textContent=p.qualification+' Source: discussion paper, section '+p.source_section+'.';$('props').append(a)});
+/* network */
+const G=[
+{id:'p',t:['People and','judgement'],d:'People and judgement: research, technical and methodological judgement.',lab:'judgement and expertise',x:10,y:50,c:'p',path:'M105 122 C105 220 250 240 250 325'},
+{id:'m',t:['Maintenance and','coordination'],d:'Maintenance and coordination: upkeep, troubleshooting, training, trust and institutional memory.',lab:'upkeep and coordination',x:400,y:50,c:'m',path:'M350 325 C350 240 495 220 495 122'},
+{id:'r',t:['Resources and','employment'],d:'Resources and employment: funding, equipment, jobs, supervision and access.',lab:'funding, jobs, equipment',x:10,y:600,c:'r',path:'M105 598 C105 500 250 480 250 395'},
+{id:'h',t:['History, context','and power'],d:'History, context and power: recognition, histories and assumptions about knowledge.',lab:'recognition and power',x:400,y:600,c:'h',path:'M350 395 C350 480 495 500 495 598'}];
+const L=[{id:'pm',a:'p',b:'m',lab:'trust and memory',path:'M200 85 Q300 15 400 85'},
+{id:'pr',a:'p',b:'r',lab:'who can enter and stay',path:'M45 120 Q-5 360 45 600'},
+{id:'mh',a:'m',b:'h',lab:'what counts as work',path:'M555 120 Q605 360 555 600'},
+{id:'rh',a:'r',b:'h',lab:'resources and power',path:'M200 635 Q300 705 400 635'}];
+function net(pre,centre,cls,aria){let s='<svg class="net '+cls+'" viewBox="0 0 600 720" role="img" aria-label="'+aria+'">';
+L.forEach(l=>{s+='<g data-l="'+l.id+'" class="off"><path id="'+pre+l.id+'" class="ln c-x" d="'+l.path+'"/><text class="lb"><textPath href="#'+pre+l.id+'" startOffset="50%" text-anchor="middle">'+l.lab+'</textPath></text></g>'});
+G.forEach(g=>{const cx=g.x+95,top=g.y<300;s+='<g data-g="'+g.id+'" class="off"><path id="'+pre+g.id+'" class="ln c-'+g.c+'" d="'+g.path+'"/><text class="lb"><textPath href="#'+pre+g.id+'" startOffset="50%" text-anchor="middle">'+g.lab+'</textPath></text><rect class="pill c-'+g.c+'" x="'+g.x+'" y="'+g.y+'" width="190" height="70" rx="12"/><text class="pt" text-anchor="middle" x="'+cx+'" y="'+(g.y+30)+'">'+g.t[0]+'<tspan x="'+cx+'" dy="22">'+g.t[1]+'</tspan></text><text class="ftag" text-anchor="middle" x="'+cx+'" y="'+(top?g.y-8:g.y+92)+'">● In focus</text></g>'});
+s+='<rect x="205" y="325" width="190" height="70" rx="12" fill="#043047" stroke="#ef168d" stroke-width="4"/><text class="pt" text-anchor="middle" x="300" y="355">'+centre[0]+'<tspan x="300" dy="22">'+centre[1]+'</tspan></text></svg>';return s}
+const show=(root,gs)=>{root.querySelectorAll('[data-g]').forEach(e=>e.classList.toggle('off',!gs.includes(e.dataset.g)));
+root.querySelectorAll('[data-l]').forEach(e=>{const l=L.find(x=>x.id===e.dataset.l);e.classList.toggle('off',!(gs.includes(l.a)&&gs.includes(l.b)))})};
+/* ch1 */
+$('net1').innerHTML=net('n1',['A visible','publication'],'','The publication stays at the centre. Labelled flowing lines connect it to sets of contributions and conditions as they are revealed; line length, thickness and position carry no meaning.');
+let st=0;const T=$('trace'),LL=$('layerList');
+function draw1(){show($('net1'),G.slice(0,st).map(g=>g.id));LL.innerHTML='<li>A visible publication, always in view.</li>'+G.slice(0,st).map(g=>'<li>'+g.d+'</li>').join('');
+$('tstat').textContent=st?st+' of 4 sets shown. Cross-links appear as the sets they connect appear.':'Nothing traced yet.';
+T.textContent=st===4?'Start again':'Reveal '+G[st].t.join(' ').toLowerCase()}
+T.onclick=()=>{st=st===4?0:st+1;draw1()};draw1();
+/* ch2 */
+$('net2').innerHTML=net('n2',['The same','research activity'],'lens','The same network as before with all relationships visible. A selected perspective marks some positions as in focus.');
+show($('net2'),['p','m','r','h']);
+const N={p:'people and judgement',m:'maintenance and coordination',r:'resources and employment',h:'history, context and power'},LN={pm:'trust and memory (between people and maintenance)',pr:'who can enter and stay (between people and resources)',mh:'what counts as work (between maintenance and power)',rh:'resources and power (between resources and history)'};
+const LS=[
+{n:'Sustaining infrastructure',s:'3.1',g:['p','m'],l:['pm'],q:['What makes a contribution legible as knowledge-producing labour?','Is unseen work a sign of skill, of fragility, or of unequal burden?']},
+{n:'Becoming and remaining a researcher',s:'3.2',g:['p','r'],l:['pr'],q:['What conditions enable people to enter, develop and remain?','Where does agency work with, around or against the system?']},
+{n:'Being involved in a project',s:'3.3',g:['p','r','h'],l:['pr','rh'],q:['What was still open to change when someone became involved?','Who could make, or override, decisions?']},
+{n:'Receiving resources',s:'3.4',g:['r','h'],l:['rh'],q:['Where did resources move, and where did decision-making remain?','Which arrangements are reciprocal?']},
+{n:'Working with a policy label',s:'3.5',g:['m','h'],l:['mh'],q:['What changes when existing practices acquire a policy label?','Which practices fit no recognised category, and does the term travel unchanged?']},
+{n:'Holding other knowledge traditions',s:'3.6',g:['p','h'],l:[],q:['Who gets to decide what counts as knowledge?','Which differences between knowledge traditions must stay visible?']}];
+const lb=$('lensBtns'),lo=$('lensOut');
+function setLens(i){const v=LS[i];lb.querySelectorAll('button').forEach((b,j)=>b.setAttribute('aria-pressed',j===i));
+$('net2').querySelectorAll('[data-g],[data-l]').forEach(e=>e.classList.toggle('focus',(e.dataset.g&&v.g.includes(e.dataset.g))||(e.dataset.l&&v.l.includes(e.dataset.l))));
+lo.innerHTML='<h3></h3><p><strong>Questions this position may bring into view:</strong></p><ul>'+v.q.map(x=>'<li>'+x+'</li>').join('')+'</ul><p class="note"></p>';
+lo.querySelector('h3').textContent=v.n;
+lo.querySelector('.note').textContent='In focus: '+v.g.map(x=>N[x]).concat(v.l.map(x=>LN[x])).join('; ')+'. Derived from paper section '+v.s+'. Illustrative lens, not a participant account; the rest of the network remains.'}
+LS.forEach((v,i)=>{const b=document.createElement('button');b.type='button';b.textContent=v.n;b.onclick=()=>setLens(i);lb.append(b)});setLens(0);
+/* ch4 dimensions */
+const D=[['Access','Who can enter, and under what conditions?'],['Authority','Who can make or override a decision?'],['Influence','Can a view alter the course of the work?'],['Ownership','Who controls, retains or is credited for the work?'],['Participation','What can people actually take part in?'],['Voice','Can people express a view, including disagreement?']];
+const dc=['c-p','c-m','c-r','c-h','c-x','c-p'];
+let s3='<svg class="net dim" viewBox="0 0 600 520" role="img" aria-label="Six flowing lines leave one starting point labelled Becomes involved and end at six labelled dimensions. Listed alphabetically; line shape carries no meaning.">';
+D.forEach((d,i)=>{const y=50+i*84;s3+='<g data-d="'+i+'"><path class="ln '+dc[i]+'" d="M70 260 C180 260 230 '+y+' 400 '+y+'"/><text class="dl" x="414" y="'+(y+7)+'">'+d[0]+'</text></g>'});
+s3+='<circle cx="70" cy="260" r="11" fill="#043047" stroke="#f5f5f1" stroke-width="3"/><text class="lb" x="14" y="296" style="font-size:16px;fill:#f5f5f1">Becomes involved</text></svg>';
+$('net3').innerHTML=s3;
+const db=$('dimBtns');
+function setDim(i){db.querySelectorAll('button').forEach((b,j)=>b.setAttribute('aria-pressed',j===i));
+$('net3').querySelectorAll('[data-d]').forEach(e=>{const on=+e.dataset.d===i;e.classList.toggle('sel',on);e.querySelector('text').textContent=(on?'● ':'')+D[+e.dataset.d][0]});
+$('dimOut').innerHTML='<h3></h3><p></p>';$('dimOut').firstChild.textContent=D[i][0];$('dimOut').lastChild.textContent=D[i][1]+' The answer may differ from the answers to the other five.'}
+D.forEach((d,i)=>{const b=document.createElement('button');b.type='button';b.textContent=d[0];b.onclick=()=>setDim(i);db.append(b)});setDim(0);
+/* ch5 context */
+const C=[['Purpose','What purpose is the practice trying to serve, and for whom?',.12],['Conditions','What histories, resources, languages and authority make it possible here?',.5],['Consequences','Who benefits, who carries the work, and what becomes less visible?',.9]];
+const cs=['#ef168d','#21b7ac','#74b7df'];
+let s4='<svg class="net" viewBox="0 0 600 420" role="img" aria-label="Three overlapping loops with a flowing path crossing them. Three points on the path are labelled Purpose, Conditions and Consequences. A solid circle starts the path and a dashed circle ends it. The loops are a metaphor, not bounded systems.">';
+[[190,210,-20,'a context'],[300,215,10,'another context'],[410,210,35,'further contexts']].forEach((e,i)=>{s4+='<ellipse cx="'+e[0]+'" cy="'+e[1]+'" rx="165" ry="125" transform="rotate('+e[2]+' '+e[0]+' '+e[1]+')" fill="none" stroke="'+cs[i]+'" stroke-width="3"/>'});
+s4+='<text class="lb" x="45" y="395" style="font-size:14px">a context</text><text class="lb" x="255" y="405" style="font-size:14px">another context</text><text class="lb" x="480" y="395" style="font-size:14px">further contexts</text><path id="cp" d="M60 215 C170 90 280 340 380 215 S500 150 548 205" fill="none" stroke="#f2ce35" stroke-width="3"/><circle cx="60" cy="215" r="10" fill="#f2ce35"/><circle cx="548" cy="205" r="11" fill="none" stroke="#f2ce35" stroke-width="3" stroke-dasharray="4 3"/></svg>';
+$('net4').innerHTML=s4;const cp=$('net4').querySelector('#cp'),len=cp.getTotalLength(),svg4=$('net4').querySelector('svg'),cb=$('ctxBtns'),mk=[];
+C.forEach((c,i)=>{const pt=cp.getPointAtLength(len*c[2]),g=document.createElementNS(NS,'g');
+g.innerHTML='<circle r="9" fill="#043047" stroke="#f5f5f1" stroke-width="3"/><text class="lb" text-anchor="middle" y="'+(i==1?32:-18)+'" style="font-size:18px;font-weight:700;fill:#f5f5f1"></text>';
+g.setAttribute('transform','translate('+pt.x+' '+pt.y+')');g.querySelector('text').textContent=c[0];svg4.append(g);mk.push(g)});
+function setCtx(i){cb.querySelectorAll('button').forEach((b,j)=>b.setAttribute('aria-pressed',j===i));mk.forEach((g,j)=>{g.querySelector('circle').setAttribute('fill',j===i?'#f2ce35':'#043047');g.querySelector('text').textContent=(j===i?'● ':'')+C[j][0]});
+$('ctxOut').innerHTML='<h3></h3><p></p>';$('ctxOut').firstChild.textContent=C[i][0];$('ctxOut').lastChild.textContent=C[i][1]+' What, if anything, travels unchanged?'}
+C.forEach((c,i)=>{const b=document.createElement('button');b.type='button';b.textContent=c[0];b.onclick=()=>setCtx(i);cb.append(b)});setCtx(0);
+</script></body></html>
